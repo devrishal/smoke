@@ -2,7 +2,7 @@
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import { ProposalProfile } from '../../../components/Proposals/ProposalProfile';
-import loadDAOModules from '../../dao/loader';
+import loadDAOModules from '../../dao/daoLoader';
 
 function ProposalProfilePage() {
   const router = useRouter();

@@ -2,7 +2,7 @@
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import ProfilePage from '../../../components/Delegates/Profile';
-import loadDAOModules from '../../dao/loader';
+import loadDAOModules from '../../dao/daoLoader';
 
 function DelegateProfile() {
   const router = useRouter();

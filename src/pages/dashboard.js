@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Profile from '../../components/Dashboard/Profile';
 import { useRouter } from 'next/router';
 import Feed from '../../components/DAOs/Feed';
-import loadDAOModules from '../dao/loader';
+import loadDAOModules from '../dao/daoLoader';
 
 function Dashboard() {
   const [members, setMembers] = useState([]);
