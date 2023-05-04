@@ -3,7 +3,7 @@ import React from 'react';
 import styles from '../../src/styles/components/ProposalCard.module.css';
 
 function ProposalCard({ proposal, onProposalClick }) {
-    const { id, description, startDate, endDate, status, forVotes, againstVotes, dao } = proposal;
+    const { id, description, startDate, endDate, status, votesFor, votesAgainst, dao } = proposal;
   
     return (
     <div className={styles.card} onClick={() => onProposalClick(proposal)}>
@@ -22,10 +22,10 @@ function ProposalCard({ proposal, onProposalClick }) {
           <strong>End Date:</strong> {endDate}
         </div>
         <div>
-          <strong>Votes For:</strong> {forVotes}
+          <strong>Votes For:</strong> {votesFor}
         </div>
         <div>
-          <strong>Votes Against:</strong> {againstVotes}
+          <strong>Votes Against:</strong> {votesAgainst}
         </div>
       </div>
     </div>

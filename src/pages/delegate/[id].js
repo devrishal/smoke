@@ -38,7 +38,6 @@ function DelegateProfile() {
       console.log("No ID found");
     }
   }, [id]);
-  
 
   if (!id) {
     console.log('No ID found');

@@ -17,10 +17,10 @@ function Dashboard() {
       let allMembers = [];
       let allProposals = [];
       const daoList = await loadDAOModules();
-
+    
       for (const dao of daoList) {
         const delegates = await dao.getTopDelegates();
-        const latestProposals = await dao.getLatestProposals(); // Get the latest proposals
+        const detailedProposals = await dao.getProposals(); // Use the getProposals function instead of getLatestProposals
         const updatedDelegates = delegates.map(delegate => {
           const daos = delegate.daos || [];
           if (!daos.some(d => d.name === dao.name)) {
@@ -29,12 +29,12 @@ function Dashboard() {
           return { ...delegate, daos };
         }).filter(delegate => delegate.daos.some(dao => dao.name === dao.name));
         allMembers = allMembers.concat(updatedDelegates.filter(delegate => delegate.daos.some(dao => dao.name === dao.name)));
-        allProposals = allProposals.concat(latestProposals); // Use the latest proposals here
+        allProposals = allProposals.concat(detailedProposals); // Use the detailed proposals fetched using getProposals
       }
-
+    
       setMembers(allMembers);
       setProposals(allProposals);
-    };
+    };    
 
     fetchDelegatesAndProposals();
   }, []);

@@ -4,8 +4,6 @@ import DelegateCard from './DelegateCard';
 import ProposalCard from './ProposalCard';
 
 function Feed({ delegates, proposals, onDelegateCardClick, onProposalClick }) {
-    console.log('delegates:', delegates);
-    console.log('proposals:', proposals);
     return (
         <div>
             <h2>Delegates</h2>

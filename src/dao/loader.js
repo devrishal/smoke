@@ -2,7 +2,7 @@ async function loadDAOModules() {
   // Add the import() statements for all your DAO files here
   const daoModules = [
       import('./uniswap'),
-      import('./compound')
+      import('./compound'),
       // Add more DAOs here as needed
   ];
 
