@@ -3,9 +3,6 @@ import Profile from '../../components/Dashboard/Profile';
 import { useRouter } from 'next/router';
 import Feed from '../../components/DAOs/Feed';
 import loadDAOModules from '../dao/loader';
-import { getTopDelegates as getUniswapDelegates, getProposals as getUniswapProposals } from '../../src/dao/uniswap';
-import { getTopDelegates as getCompoundDelegates, getProposals as getCompoundProposals } from '../../src/dao/compound';
-
 
 function Dashboard() {
   const [members, setMembers] = useState([]);
