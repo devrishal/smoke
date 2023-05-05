@@ -4,6 +4,10 @@ async function loadDAOModules() {
   const daoModules = [
     import('./uniswap'),
     import('./compound'),
+    import('./gitcoin'),
+    import('./dydx'),
+    import('./aave'),
+    import('./ens'),
     // Add more DAOs here as needed
   ];
 

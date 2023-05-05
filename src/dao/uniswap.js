@@ -6,7 +6,7 @@ import {
   getTopDelegates as sharedGetTopDelegates,
 } from "./subgraphLoader";
 
-const uniswapGovernanceSubgraphUrl = "https://api.thegraph.com/subgraphs/name/arr00/uniswap-governance-v2";
+const uniswapGovernanceSubgraphUrl = "https://api.thegraph.com/subgraphs/name/messari/uniswap-governance";
 
 const uniswapDAOInfo = {
   name: "Uniswap",
@@ -31,6 +31,7 @@ export function getUniswapTopDelegates() {
 }
 
 const uniswapDAO = {
+  name: uniswapDAOInfo.name,
   getProposals: getUniswapProposals,
   getDelegateById: getUniswapDelegateById,
   getLatestProposals: getUniswapLatestProposals,

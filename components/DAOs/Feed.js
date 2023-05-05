@@ -1,27 +1,19 @@
-// Feed.js
 import React from 'react';
-import DelegateCard from './DelegateCard';
+import ProtocolCard from './ProtocolCard';
 import ProposalCard from './ProposalCard';
 
-function Feed({ delegates, proposals, onDelegateCardClick, onProposalClick }) {
-    return (
-        <div>
-            <h2>Delegates</h2>
-            <div>
-                {delegates.map((delegate, index) => (
-                    <DelegateCard key={index} delegate={delegate} onDelegateCardClick={onDelegateCardClick} />
-                ))}
-            </div>
-            <h2>Proposals</h2>
-            <div>
-                {proposals.map((proposal, index) => (
-                    <ProposalCard key={index} proposal={proposal} onProposalClick={onProposalClick} />
-                ))}
-            </div>
-        </div>
-    );
+function Feed({ daos, dao, onProposalClick, onProtocolCardClick }) {
+  return (
+    <div>
+      {dao
+        ? dao.proposals.map(proposal => (
+            <ProposalCard key={proposal.id} proposal={proposal} onProposalClick={onProposalClick} />
+          ))
+        : daos.map(d => (
+            <ProtocolCard key={d.name} dao={d} onProtocolCardClick={onProtocolCardClick} /> // Add onProposalClick prop here
+          ))}
+    </div>
+  );
 }
-  
+
 export default Feed;
-
-

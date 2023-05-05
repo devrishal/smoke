@@ -1,4 +1,4 @@
-// subgraph.js
+// subgraphLoader.js
 import { fetchGraphQL } from "../lib/utils";
 import { getENSName } from "../lib/ens";
 
@@ -10,13 +10,23 @@ export async function getProposals(subgraphUrl, daoInfo, latestProposalsFunc) {
 
       const dao = delegate.daos[0];
 
+      const decimals = 18;
+
       const votesFor = proposal.votes
-        .filter((vote) => vote.support)
-        .reduce((acc, vote) => acc + parseInt(vote.votes), 0);
+        .filter((vote) => vote.choice === "FOR")
+        .reduce((acc, vote) => acc + parseInt(vote.weight), 0) / (10 ** decimals);
+      
       const votesAgainst = proposal.votes
-        .filter((vote) => !vote.support)
-        .reduce((acc, vote) => acc + parseInt(vote.votes), 0);
-      console.log(`Proposal ${proposal.id} has ${votesFor} votes for and ${votesAgainst} votes against`);
+        .filter((vote) => vote.choice === "AGAINST")
+        .reduce((acc, vote) => acc + parseInt(vote.weight), 0) / (10 ** decimals);      
+    
+
+      // Add the following lines for debugging
+      console.log('Proposal', proposal.id);
+      console.log('Votes:', proposal.votes);
+      console.log(`Votes for (${votesFor}):`, proposal.votes.filter((vote) => vote.choice === 1));
+      console.log(`Votes against (${votesAgainst}):`, proposal.votes.filter((vote) => vote.choice === 0));
+
       return {
         ...proposal,
         dao: dao,
@@ -25,13 +35,15 @@ export async function getProposals(subgraphUrl, daoInfo, latestProposalsFunc) {
         id: proposal.id,
         votesFor: votesFor,
         votesAgainst: votesAgainst,
-        votes: proposal.votes, // add this line to retain individual vote details
+        status: proposal.state,
+        votes: proposal.votes,
       };
     })
   );
 
   return proposals;
 }
+
 
 export async function getDelegateById(subgraphUrl, id, daoInfo) {
   const delegateQuery = `
@@ -63,22 +75,22 @@ export async function getDelegateById(subgraphUrl, id, daoInfo) {
   };
 }
 
-export async function getLatestProposals(subgraphUrl, daoInfo, limit = 10) {
+export async function getLatestProposals(subgraphUrl, daoInfo, first = 10) {
   const latestProposalsQuery = `
     {
-      proposals(first: ${limit}, orderBy: startBlock, orderDirection: desc) {
+      proposals(first: ${first}, orderBy: startBlock, orderDirection: desc) {
         id
         description
         startBlock
         endBlock
-        status
+        state
         proposer {
           id
         }
         votes {
           id
-          support
-          votes
+          choice
+          weight
         }
       }
     }
@@ -98,10 +110,10 @@ export async function getLatestProposals(subgraphUrl, daoInfo, limit = 10) {
   return proposals;
 }
 
-export async function getTopDelegates(subgraphUrl, daoInfo) {
+export async function getTopDelegates(subgraphUrl, daoInfo, first = 10) {
   const delegatesQuery = `
     {
-      delegates(first: 10, orderDirection: desc, orderBy: delegatedVotes) {
+      delegates(first: ${first}, orderDirection: desc, orderBy: delegatedVotes) {
         id
         delegatedVotesRaw
         delegatedVotes
@@ -125,41 +137,42 @@ delegates.map(async (delegate) => {
   const delegateId = delegate.id;
 
   const submittedProposalsQuery = `
-    {
-      proposals(where: {proposer: "${delegateId}"}, first: 10) {
+  {
+    proposals(where: {proposer: "${delegateId}"}, first: 10) {
+      id
+      description
+      startBlock
+      endBlock
+      state
+      proposer {
         id
-        description
+      }
+      votes {
+        id
+        choice
+        weight
+      }
+    }
+  }
+  `;
+
+const votedProposalsQuery = `
+  {
+    votes(first: 10, where: {voter: "${delegateId}"}) {
+      id
+      choice
+      weight
+      proposal {
+        id
         startBlock
         endBlock
-        status
-        proposer {
-          id
-        }
-        votes {
-          id
-          support
-          votes
-        }
+        state
+        description
       }
     }
+  }
     `;
 
-  const votedProposalsQuery = `
-    {
-      votes(first: 10, where: {voter: "${delegateId}"}) {
-        id
-        support
-        votes
-        proposal {
-          id
-          startBlock
-          endBlock
-          status
-          description
-        }
-      }
-    }
-    `;
 
   const submittedProposalsData = await fetchGraphQL(subgraphUrl, submittedProposalsQuery);
   const votedProposalsData = await fetchGraphQL(subgraphUrl, votedProposalsQuery);
@@ -179,12 +192,12 @@ delegates.map(async (delegate) => {
     votingHistory.push({
       proposalDescription: vote.proposal.description,
       protocol: daoInfo.name,
-      howTheyVoted: vote.support ? "FOR" : "AGAINST",
-      numberOfVotesCast: vote.votes,
+      howTheyVoted: vote.choice === "FOR" ? "FOR" : "AGAINST", // Update this line
+      numberOfVotesCast: vote.weight, // Update this line
       proposalId: vote.proposal.id,
       startDate: startDate,
       endDate: endDate,
-      status: vote.proposal.status,
+      status: vote.proposal.state, // Update this line
       url: `${daoInfo.url}/governance/${vote.proposal.id}`,
     });
   });
@@ -195,23 +208,30 @@ delegates.map(async (delegate) => {
     const endDateTimestamp = proposal.endBlock;
     const startDate = startDateTimestamp.toString();
     const endDate = endDateTimestamp.toString();
+  
+    const decimals = 18;
 
-    const votesFor = proposal.votes.filter((vote) => vote.support).reduce((acc, vote) => acc + parseInt(vote.votes), 0);
-    const votesAgainst = proposal.votes.filter((vote) => !vote.support).reduce((acc, vote) => acc + parseInt(vote.votes), 0);
-
-    const approved = votesFor > votesAgainst;
+    const votesFor = proposal.votes
+      .filter((vote) => vote.choice === "FOR")
+      .reduce((acc, vote) => acc + parseInt(vote.weight), 0) / (10 ** decimals);
+    
+    const votesAgainst = proposal.votes
+      .filter((vote) => vote.choice === "AGAINST")
+      .reduce((acc, vote) => acc + parseInt(vote.weight), 0) / (10 ** decimals);    
+    
     submittedProposals.push({
       proposalId: proposal.id,
       description: proposal.description,
       startDate: startDate,
       endDate: endDate,
-      status: proposal.status,
+      status: proposal.state, // Update this line
       url: `${daoInfo.url}/governance/${proposal.id}`,
       votesFor: votesFor,
       votesAgainst: votesAgainst,
-      approved: approved,
+      // approved: approved, <-- Remove this line
     });
   });
+  
 
   const ensName = await getENSName(delegate.id); // Pass the delegate's Ethereum address to the getENSName function
 

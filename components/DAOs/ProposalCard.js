@@ -4,7 +4,7 @@ import styles from '../../src/styles/components/ProposalCard.module.css';
 
 function ProposalCard({ proposal, onProposalClick }) {
     const { id, description, startDate, endDate, status, votesFor, votesAgainst, dao } = proposal;
-  
+    
     return (
     <div className={styles.card} onClick={() => onProposalClick(proposal)}>
       <div className={styles.cardSubtitle}>{`ID: ${id}`}</div>

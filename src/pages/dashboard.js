@@ -5,43 +5,31 @@ import Feed from '../../components/DAOs/Feed';
 import loadDAOModules from '../dao/daoLoader';
 
 function Dashboard() {
-  const [members, setMembers] = useState([]);
-  const [proposals, setProposals] = useState([]);
+  const [daos, setDaos] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchDelegatesAndProposals = async () => {
-      let allMembers = [];
-      let allProposals = [];
+    const fetchDAOModules = async () => {
       const daoList = await loadDAOModules();
-    
+      const daoListWithProposals = [];
+
       for (const dao of daoList) {
-        const delegates = await dao.getTopDelegates();
-        const detailedProposals = await dao.getProposals(); // Use the getProposals function instead of getLatestProposals
-        const updatedDelegates = delegates.map(delegate => {
-          const daos = delegate.daos || [];
-          if (!daos.some(d => d.name === dao.name)) {
-            daos.push(dao);
-          }
-          return { ...delegate, daos };
-        }).filter(delegate => delegate.daos.some(dao => dao.name === dao.name));
-        allMembers = allMembers.concat(updatedDelegates.filter(delegate => delegate.daos.some(dao => dao.name === dao.name)));
-        allProposals = allProposals.concat(detailedProposals); // Use the detailed proposals fetched using getProposals
+        const proposals = await dao.getProposals();
+        daoListWithProposals.push({ ...dao, proposals });
       }
-    
-      setMembers(allMembers);
-      setProposals(allProposals);
-    };    
 
-    fetchDelegatesAndProposals();
+      setDaos(daoListWithProposals);
+    };
+
+    fetchDAOModules();
   }, []);
-
-  const handleMemberClick = (member) => {
-    router.push(`/delegate/${member.id}`);
-  };
 
   const handleProposalClick = (proposal) => {
     router.push(`/proposal/${proposal.id}`);
+  };
+
+  const handleProtocolCardClick = (daoName) => {
+    router.push(`/dao/${daoName}`);
   };
 
   return (
@@ -49,15 +37,9 @@ function Dashboard() {
       <div>
         <Profile />
       </div>
-      <Feed
-        delegates={members}
-        proposals={proposals}
-        onDelegateCardClick={handleMemberClick}
-        onProposalClick={handleProposalClick}
-      />
+      <Feed daos={daos} onProtocolCardClick={handleProtocolCardClick} />
     </div>
   );
 }
-
 
 export default Dashboard;
