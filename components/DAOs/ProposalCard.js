@@ -1,12 +1,20 @@
-//ProposalCard.js
-import React from 'react';
-import styles from '../../src/styles/components/ProposalCard.module.css';
+import React from "react";
+import styles from "../../src/styles/components/ProposalCard.module.css";
 
-function ProposalCard({ proposal, onProposalClick }) {
-    const { id, description, startDate, endDate, status, votesFor, votesAgainst, dao } = proposal;
-    
-    return (
-    <div className={styles.card} onClick={() => onProposalClick(proposal)}>
+function ProposalCard({ proposal, daoName, onProposalClick }) {
+  const {
+    id,
+    description,
+    startDate,
+    endDate,
+    status,
+    votesFor,
+    votesAgainst,
+    dao,
+  } = proposal;
+
+  return (
+    <div className={styles.card} onClick={() => onProposalClick(daoName, id)}>
       <div className={styles.cardSubtitle}>{`ID: ${id}`}</div>
       <div className={styles.cardDetails}>
         <div>

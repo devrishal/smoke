@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import Profile from '../../components/Dashboard/Profile';
-import { useRouter } from 'next/router';
-import Feed from '../../components/DAOs/Feed';
-import loadDAOModules from '../dao/daoLoader';
+import React, { useState, useEffect, Suspense } from "react";
+import { useRouter } from "next/router";
+import loadDAOModules from "../lib/dao/daoLoader";
+const Feed = React.lazy(() => import("../../components/DAOs/Feed"));
 
 function Dashboard() {
   const [daos, setDaos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -19,25 +19,33 @@ function Dashboard() {
       }
 
       setDaos(daoListWithProposals);
+      setIsLoading(false);
     };
 
     fetchDAOModules();
   }, []);
 
-  const handleProposalClick = (proposal) => {
-    router.push(`/proposal/${proposal.id}`);
+  const handleProposalClick = (daoName, proposalId) => {
+    router.push(`/dao/${daoName}/proposal/${proposalId}`);
   };
 
   const handleProtocolCardClick = (daoName) => {
     router.push(`/dao/${daoName}`);
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div>
-      <div>
-        <Profile />
-      </div>
-      <Feed daos={daos} onProtocolCardClick={handleProtocolCardClick} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Feed
+          daos={daos}
+          onProtocolCardClick={handleProtocolCardClick}
+          onProposalClick={handleProposalClick}
+        />
+      </Suspense>
     </div>
   );
 }
