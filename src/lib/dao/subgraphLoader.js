@@ -140,3 +140,26 @@ export async function getProposalByDaoAndId(subgraphUrl, daoName, proposalId) {
 
   return proposal;
 }
+
+export async function getTokenHolderById(subgraphUrl, id) {
+  const tokenHolderQuery = `
+    {
+      tokenHolder(id: "${id}") {
+        id
+        delegate {
+          id
+          delegatedVotes
+        }
+      }
+    }
+  `;
+
+  const tokenHolderData = await fetchGraphQL(subgraphUrl, tokenHolderQuery);
+
+  if (tokenHolderData && tokenHolderData.errors) {
+    console.error("GraphQL Errors:", tokenHolderData.errors);
+    return null;
+  }
+
+  return tokenHolderData.data.tokenHolder;
+}

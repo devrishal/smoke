@@ -5,6 +5,7 @@ import {
   getLatestProposals as sharedGetLatestProposals,
   getTopDelegates as sharedGetTopDelegates,
   getProposalByDaoAndId as sharedGetProposalByDaoAndId, // Import the function
+  getTokenHolderById as sharedGetTokenHolderById,
 } from "./subgraphLoader";
 
 export default function daoFactory(daoInfo, governanceSubgraphUrl) {
@@ -37,6 +38,10 @@ export default function daoFactory(daoInfo, governanceSubgraphUrl) {
     );
   }
 
+  function getTokenHolderById(id) {
+    return sharedGetTokenHolderById(governanceSubgraphUrl, id);
+  }
+
   return {
     name: daoInfo.name,
     getProposals,
@@ -44,5 +49,6 @@ export default function daoFactory(daoInfo, governanceSubgraphUrl) {
     getLatestProposals,
     getTopDelegates,
     getProposalByDaoAndId, // Add the function to the returned object
+    getTokenHolderById,
   };
 }

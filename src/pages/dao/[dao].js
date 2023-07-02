@@ -1,5 +1,5 @@
 // Dao.js
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { useRouter } from "next/router";
 import DAOContext from "../../contexts/DAOContext";
 import Feed from "../../../components/DAOs/Feed";
@@ -7,43 +7,16 @@ import ProposalProfile from "../../../components/Proposals/ProposalProfile";
 
 function Dao() {
   const daos = useContext(DAOContext);
-
-  const [daoData, setDaoData] = useState(null);
-  const [selectedProposal, setSelectedProposal] = useState(null); // Add this line
   const router = useRouter();
-  const { dao } = router.query;
+  const { dao: daoName } = router.query;
 
-  useEffect(() => {
-    console.log("Dao useEffect [dao, daos] start");
-    const start = Date.now();
-    if (dao) {
-      const selectedDAO = daos.find((d) => d.name === dao);
-      if (selectedDAO) {
-        setDaoData(selectedDAO);
-      }
-    }
-    console.log("Dao useEffect [dao, daos] end", Date.now() - start);
-  }, [dao, daos]);
+  // Find the selected DAO directly in the render method
+  const daoData = daos.find((d) => d.name === daoName);
 
-  useEffect(() => {
-    console.log("Dao useEffect [router] start");
-    const start = Date.now();
-    if (
-      router.asPath.includes("proposal") &&
-      router.state &&
-      router.state.proposal
-    ) {
-      setSelectedProposal(router.state.proposal);
-    }
-    console.log("Dao useEffect [router] end", Date.now() - start);
-  }, [router]);
+  const [selectedProposal, setSelectedProposal] = useState(null);
 
   const handleProposalClick = async (daoName, id, proposal) => {
-    console.log("handleProposalClick start");
-    const start = Date.now();
-    console.log(proposal);
     setSelectedProposal(proposal);
-    console.log("handleProposalClick end", Date.now() - start);
   };
 
   const handleCloseProposal = () => {
@@ -51,7 +24,7 @@ function Dao() {
   };
 
   const handleBackClick = () => {
-    setDaoData(null); // Set daoData to null to go back to the list of DAOs
+    router.back();
   };
 
   return (
@@ -66,7 +39,7 @@ function Dao() {
           <Feed
             dao={daoData}
             onProposalClick={handleProposalClick}
-            onBackClick={handleBackClick} // Pass handleBackClick as a prop
+            onBackClick={handleBackClick}
           />
         )
       )}
