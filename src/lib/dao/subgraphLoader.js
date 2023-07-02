@@ -108,7 +108,6 @@ export async function getLatestProposals(subgraphUrl, daoInfo, first = 10) {
 }
 
 export async function getProposalByDaoAndId(subgraphUrl, daoName, proposalId) {
-  console.log("Arguments:", subgraphUrl, daoName, proposalId);
   const proposalQuery = `
     {
       proposal(id: "${proposalId}") {
@@ -133,8 +132,6 @@ export async function getProposalByDaoAndId(subgraphUrl, daoName, proposalId) {
     console.error("GraphQL Errors:", proposalData.errors);
     return null;
   }
-
-  console.log("Proposal data:", proposalData);
 
   const proposal = proposalData.data.proposal;
 

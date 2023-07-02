@@ -14,7 +14,10 @@ function ProposalCard({ proposal, daoName, onProposalClick }) {
   } = proposal;
 
   return (
-    <div className={styles.card} onClick={() => onProposalClick(daoName, id)}>
+    <div
+      className={styles.card}
+      onClick={() => onProposalClick(daoName, id, proposal)}
+    >
       <div className={styles.cardSubtitle}>{`ID: ${id}`}</div>
       <div className={styles.cardDetails}>
         <div>
