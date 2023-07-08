@@ -6,8 +6,6 @@ function ProtocolCard({ dao, onProtocolCardClick }) {
   const latestProposal =
     proposals && proposals.length > 0 ? proposals[0] : null;
 
-  console.log("DAO object:", dao);
-
   return (
     <div className={styles.card} onClick={() => onProtocolCardClick(name)}>
       <h3>{name}</h3>

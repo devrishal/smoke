@@ -20,7 +20,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 function ProposalProfile({ proposal, onClose }) {
   const router = useRouter();
-  console.log("ProposalProfile received proposal:", proposal);
   const {
     proposalId,
     description,
@@ -33,14 +32,8 @@ function ProposalProfile({ proposal, onClose }) {
     votes,
   } = proposal;
 
-  console.log("proposl.votes:", proposal.votesAgainst, proposal.votesFor);
-
   // Sort the votes array by weight in descending order and slice it to get the top 5
   const topVotes = [...votes].sort((a, b) => b.weight - a.weight).slice(0, 5);
-
-  console.log("forVotes:", forVotes);
-  console.log("againstVotes:", againstVotes);
-  console.log("proposal:", proposal);
 
   return (
     <Card sx={{ maxWidth: 800, margin: "auto", marginTop: 2, borderRadius: 2 }}>

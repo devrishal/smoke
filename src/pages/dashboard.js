@@ -1,17 +1,19 @@
-// Dashboard.js
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import loadDAOModules from "../lib/dao/daoLoader";
 import DAOContext from "../contexts/DAOContext";
 import Feed from "../../components/DAOs/Feed";
 import SearchBar from "../../components/Dashboard/SearchBar";
-import Profile from "../../components/Dashboard/Profile"; // import the Profile component
+import Profile from "../../components/Dashboard/Profile";
 
 function Dashboard() {
   const [tokenHolder, setTokenHolder] = useState(null);
+  const [tokenHolderDAOs, setTokenHolderDAOs] = useState([]);
+  const [tokenHolderDAO, setTokenHolderDAO] = useState(null);
   const [daos, setDaos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isNavigating, setIsNavigating] = useState(false); // Add this line
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [isSearching, setIsSearching] = useState(false); // Add this line
   const router = useRouter();
 
   useEffect(() => {
@@ -37,26 +39,49 @@ function Dashboard() {
   };
 
   const handleProtocolCardClick = (daoName) => {
-    setIsNavigating(true); // Set isNavigating to true when a protocol card is clicked
-    router.push(`/dao/${daoName}`).then(() => setIsNavigating(false)); // Set isNavigating back to false when the navigation is complete
+    setIsNavigating(true);
+    router.push(`/dao/${daoName}`).then(() => setIsNavigating(false));
+  };
+
+  const handleProtocolButtonClick = (protocolName) => {
+    router.push(`/protocol/${protocolName}`);
   };
 
   if (isLoading || isNavigating) {
-    return <div>Loading...</div>; // Display a loading message while the data is loading or while navigating
+    return <div>Loading...</div>;
   }
 
   const handleSearch = async (searchTerm) => {
-    console.log("handleSearch start");
-    const tokenHolder = await daos[5].getTokenHolderById(searchTerm); // replace 0 with the index of the DAO you want to query
-    setTokenHolder(tokenHolder);
-    console.log("tokenHolder", tokenHolder);
+    setIsSearching(true);
+    let tokenHolders = []; // Use an array to store all the token holders
+    let tokenHolderDAOs = []; // Use an array to store all the DAOs that the token holder belongs to
+    for (const dao of daos) {
+      const tokenHolderInDAO = await dao.getTokenHolderById(searchTerm);
+      if (tokenHolderInDAO) {
+        tokenHolders.push(tokenHolderInDAO);
+        tokenHolderDAOs.push(dao);
+      }
+    }
+    setTokenHolder(tokenHolders); // Set the token holders
+    setTokenHolderDAOs(tokenHolderDAOs); // Set the DAOs that the token holder belongs to
+    setIsSearching(false);
   };
 
   return (
     <DAOContext.Provider value={daos}>
       <div>
         <SearchBar onSearch={handleSearch} />
-        {tokenHolder && <Profile tokenHolder={tokenHolder} />}
+        {isSearching ? (
+          <div>Loading...</div>
+        ) : (
+          tokenHolder && (
+            <Profile
+              tokenHolder={tokenHolder}
+              dao={tokenHolderDAOs} // Pass dao instead of daos
+              onProtocolButtonClick={handleProtocolButtonClick}
+            />
+          )
+        )}
         <Feed
           daos={daos}
           onProtocolCardClick={handleProtocolCardClick}

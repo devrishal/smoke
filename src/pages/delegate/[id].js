@@ -11,7 +11,6 @@ function DelegateProfile() {
 
   useEffect(() => {
     const fetchDelegate = async () => {
-      console.log("Fetching delegate with ID:", id);
       const daoList = await loadDAOModules();
       let foundDelegate = null;
 
@@ -22,17 +21,10 @@ function DelegateProfile() {
         if (foundDelegate) break;
       }
 
-      if (foundDelegate) {
-        console.log("Found delegate:", foundDelegate);
-      } else {
-        console.log("Delegate not found");
-      }
-
       setDelegate(foundDelegate);
     };
 
     if (id) {
-      console.log("ID found, fetching delegate");
       fetchDelegate();
     } else {
       console.log("No ID found");

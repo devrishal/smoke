@@ -1,49 +1,51 @@
-import { useRouter } from 'next/router';
-import React, { useState } from 'react';
-import Web3 from 'web3';
-import Profile from '../../components/Dashboard/Profile';
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import Web3 from "web3";
+import Profile from "../../components/Dashboard/Profile";
 
 const Login = () => {
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [web3, setWeb3] = useState(null);
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
   const connectMetamask = async () => {
     if (window.ethereum) {
       try {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        await window.ethereum.request({ method: "eth_requestAccounts" });
         const web3Instance = new Web3(window.ethereum);
         setWeb3(web3Instance);
         const accounts = await web3Instance.eth.getAccounts();
         setAddress(accounts[0]);
         setIsLoggedIn(true);
-        console.log("Address----------->"+accounts[0]);
+        console.log("Address----------->" + accounts[0]);
         router.push({
-          pathname: '/dashboard',
+          pathname: "/dashboard",
           query: { address: accounts[0] },
         });
       } catch (error) {
         console.error(error);
-        setError('Error connecting to Metamask');
+        setError("Error connecting to Metamask");
       }
     } else {
-      console.error('Metamask not detected');
-      setError('Metamask not detected. Please install Metamask to use this application.');
+      console.error("Metamask not detected");
+      setError(
+        "Metamask not detected. Please install Metamask to use this application."
+      );
     }
   };
 
   const handleLogout = () => {
     setWeb3(null);
-    setAddress('');
+    setAddress("");
     setIsLoggedIn(false);
     window.localStorage.clear();
     window.location.reload(true);
   };
 
   if (isLoggedIn) {
-    return <Profile address={address} handleLogout={handleLogout} />; 
+    return <Profile address={address} handleLogout={handleLogout} />;
   }
 
   return (
